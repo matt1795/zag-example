@@ -25,9 +25,12 @@ pub fn main() anyerror!void {
         std.process.exit(1);
     }
 
-    debug.warn("{}\n", .{try test_lib.concat(
+    const string = try test_lib.concat(
         std.heap.page_allocator,
         args.option("-a").?,
         args.option("-b").?,
-    )});
+    );
+    defer std.heap.page_allocator.free(string);
+
+    debug.warn("{}\n", .{string});
 }
