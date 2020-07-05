@@ -1,13 +1,13 @@
-const zag = @import("zag");
+const zkg = @import("zkg");
 
-pub const clap = zag.import.git(
+pub const clap = zkg.import.git(
     "https://github.com/Hejsil/zig-clap.git",
     "master",
     "clap.zig",
 );
 
-pub const test_lib = zag.import.git(
-    "https://github.com/matt1795/concat.git",
+pub const regex = zkg.import.git(
+    "https://github.com/alexnask/ctregex.zig.git",
     "master",
-    null,
+    "ctregex.zig",
 );

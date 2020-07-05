@@ -1,36 +1,25 @@
 const std = @import("std");
 const clap = @import("clap");
-const test_lib = @import("test_lib");
+const regex = @import("regex");
 
 const debug = std.debug;
 
 pub fn main() anyerror!void {
-    // First we specify what parameters our program can take.
-    // We can use `parseParam` to parse a string to a `Param(Help)`
     const params = comptime [_]clap.Param(clap.Help){
-        clap.parseParam("-a <A>") catch unreachable,
-        clap.parseParam("-b <B>") catch unreachable,
+        clap.parseParam("-a <A>, checks if matches to 'fast'") catch unreachable,
     };
 
     var args = try clap.parse(clap.Help, &params, std.heap.page_allocator);
     defer args.deinit();
 
-    if (args.option("-a") == null) {
-        debug.warn("missing '-a' argument\n", .{});
-        std.process.exit(1);
+    @setEvalBranchQuota(1250);
+    if (args.option("-a")) |string| {
+        if (try regex.match("fast", .{ .encoding = .utf8 }, string)) |res| {
+            debug.print("match!!!\n", .{});
+        } else {
+            return error.GottaGoFast;
+        }
+    } else {
+        return error.MissingArgument;
     }
-
-    if (args.option("-b") == null) {
-        debug.warn("missing '-b' argument\n", .{});
-        std.process.exit(1);
-    }
-
-    const string = try test_lib.concat(
-        std.heap.page_allocator,
-        args.option("-a").?,
-        args.option("-b").?,
-    );
-    defer std.heap.page_allocator.free(string);
-
-    debug.warn("{}\n", .{string});
 }
